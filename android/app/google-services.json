@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "590687828693",
+    "project_id": "hand-sign-cricket",
+    "storage_bucket": "hand-sign-cricket.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590687828693:android:7cf19546d02a71313ec05c",
+        "android_client_info": {
+          "package_name": "com.example.hand_sign_cricket"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjwq2dG39HskJdeREF1Er74gmGNLYHzxc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
