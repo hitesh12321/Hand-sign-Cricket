@@ -219,13 +219,11 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
 
   Widget _buildStartButton() {
     return ElevatedButton(
-      onPressed: () {
-        showAboutDialog(
-            context: context,
-            applicationName: "This feature will be implemented soon");
-      },
-      child: Text("Start Game",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      onPressed: () {},
+      child: Text(
+        "Start Game",
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
         textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
