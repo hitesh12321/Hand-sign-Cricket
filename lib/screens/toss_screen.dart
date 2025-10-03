@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hand_sign_cricket/themes/app_colors.dart';
 import 'package:hand_sign_cricket/themes/app_fonts.dart';
+import 'package:hand_sign_cricket/screens/Bot.dart';
 
 import 'game_screen.dart';
 
@@ -21,6 +22,7 @@ class _TossScreenState extends State<TossScreen> {
   String botDecision = "";
   bool isTossing = false;
   String animationAsset = "";
+  Difficulty selectedDifficulty = Difficulty.medium;
 
   void performToss() {
     setState(() {
@@ -59,7 +61,10 @@ class _TossScreenState extends State<TossScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => GameScreen(userBatsFirst: userBatsFirst),
+        builder: (context) => GameScreen(
+          userBatsFirst: userBatsFirst,
+          difficulty: selectedDifficulty,
+        ),
       ),
     );
   }
@@ -121,6 +126,10 @@ class _TossScreenState extends State<TossScreen> {
               ],
             ],
             if (!isTossing && !tossDone) ...[
+              // Difficulty Selection
+              _buildDifficultySelection(),
+              const SizedBox(height: 30),
+              
               Text("Choose Odd or Even",
                   style: TextStyle(
                       fontSize: 24,
@@ -206,6 +215,104 @@ class _TossScreenState extends State<TossScreen> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDifficultySelection() {
+    return Column(
+      children: [
+        Text(
+          "Select Bot Difficulty",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 15),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildDifficultyButton("Easy", Difficulty.easy, Colors.green),
+            _buildDifficultyButton("Medium", Difficulty.medium, Colors.orange),
+            _buildDifficultyButton("Hard", Difficulty.hard, Colors.red),
+          ],
+        ),
+        const SizedBox(height: 10),
+        _buildDifficultyDescription(),
+      ],
+    );
+  }
+
+  Widget _buildDifficultyButton(String label, Difficulty difficulty, Color color) {
+    bool isSelected = selectedDifficulty == difficulty;
+    return GestureDetector(
+      onTap: () => setState(() => selectedDifficulty = difficulty),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? color : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: color,
+            width: 3,
+          ),
+          boxShadow: [
+            if (isSelected)
+              BoxShadow(
+                color: color.withOpacity(0.4),
+                blurRadius: 8,
+                spreadRadius: 2,
+              ),
+          ],
+        ),
+        child: Text(
+          label,
+          style: AppFonts.bebasNeue(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isSelected ? Colors.white : color,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDifficultyDescription() {
+    String description;
+    Color color;
+    
+    switch (selectedDifficulty) {
+      case Difficulty.easy:
+        description = "🎯 Basic random moves with simple strategy";
+        color = Colors.green;
+        break;
+      case Difficulty.medium:
+        description = "🧠 Balanced strategy with pattern detection";
+        color = Colors.orange;
+        break;
+      case Difficulty.hard:
+        description = "🔥 Advanced AI with learning capabilities";
+        color = Colors.red;
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: color, width: 2),
+      ),
+      child: Text(
+        description,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }
