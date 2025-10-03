@@ -3,13 +3,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hand_sign_cricket/screens/menu_screen.dart';
+import 'package:hand_sign_cricket/screens/Bot.dart';
 import 'package:hand_sign_cricket/themes/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GameScreen extends StatefulWidget {
   final bool userBatsFirst;
+  final Difficulty difficulty;
 
-  GameScreen({required this.userBatsFirst});
+  GameScreen({required this.userBatsFirst, this.difficulty = Difficulty.medium});
 
   @override
   _GameScreenState createState() => _GameScreenState();
@@ -27,6 +29,7 @@ class _GameScreenState extends State<GameScreen> {
   bool gameOver = false;
   bool _showOutGif = false;
 
+  late AiBot aiBot;
   final int maxOvers = 5;
   final int maxWickets = 2;
 
@@ -34,7 +37,20 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     isPlayerBatting = widget.userBatsFirst;
+    aiBot = AiBot(difficulty: widget.difficulty);
     _loadGameData();
+    _initializeAiBot();
+  }
+
+  @override
+  void dispose() {
+    // Save pattern data when leaving the screen
+    aiBot.savePatternData();
+    super.dispose();
+  }
+
+  Future<void> _initializeAiBot() async {
+    await aiBot.loadPatternData();
   }
 
   Future<void> _loadGameData() async {
@@ -53,11 +69,22 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   int botDecision(int userShot) {
-    if (!isFirstInnings) {
-      int runsNeeded = target - botScore;
-      if (runsNeeded <= 6) return runsNeeded;
-    }
-    return Random().nextInt(6) + 1;
+    // Create current game state
+    GameState currentState = GameState(
+      playerScore: playerScore,
+      botScore: botScore,
+      wickets: wickets,
+      balls: balls,
+      overs: overs,
+      target: target,
+      isFirstInnings: isFirstInnings,
+      isPlayerBatting: isPlayerBatting,
+      maxOvers: maxOvers,
+      maxWickets: maxWickets,
+    );
+    
+    // Use AI bot to make decision
+    return aiBot.makeDecision(userShot, currentState);
   }
 
   void playBall(int shot) {
@@ -124,6 +151,10 @@ class _GameScreenState extends State<GameScreen> {
 
   void _endGame(bool playerWon) {
     gameOver = true;
+    
+    // Save AI bot learning data
+    aiBot.savePatternData();
+    
     String result = playerWon ? "🎉 You Win! 🎉" : "😢 Bot Wins! 😢";
     String gifPath = playerWon
         ? "assets/animation/win.gif"
@@ -198,6 +229,77 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           SizedBox(height: 10), // Extra space at bottom for better UI
+        ],
+      ),
+    );
+  }
+
+  String _getDifficultyLabel() {
+    switch (widget.difficulty) {
+      case Difficulty.easy:
+        return "Easy 🟢";
+      case Difficulty.medium:
+        return "Medium 🟡";
+      case Difficulty.hard:
+        return "Hard 🔴";
+    }
+  }
+
+  Color _getDifficultyColor() {
+    switch (widget.difficulty) {
+      case Difficulty.easy:
+        return Colors.green;
+      case Difficulty.medium:
+        return Colors.orange;
+      case Difficulty.hard:
+        return Colors.red;
+    }
+  }
+
+  void _showAiInfo() {
+    String info = "";
+    if (aiBot.userPattern.frequencyMap.isNotEmpty) {
+      info += "📊 Your number usage:\n";
+      for (var entry in aiBot.userPattern.frequencyMap.entries) {
+        info += "${entry.key}: ${entry.value} times\n";
+      }
+      info += "\n🎯 Bot's favorite: ${aiBot.userPattern.mostFrequent ?? 'None'}\n";
+      info += "🔍 Pattern detected: ${aiBot.userPattern.hasRepeatingPattern ? 'Yes' : 'No'}\n";
+      info += "📝 Recent choices: ${aiBot.userPattern.recentChoices.take(5).toList()}";
+    } else {
+      info = "🤖 Bot is still learning your patterns!\nPlay more to see statistics.";
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.yellowAccent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(color: Colors.black, width: 3),
+        ),
+        title: Text(
+          "🧠 AI Analysis",
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          info,
+          style: TextStyle(fontSize: 16, color: Colors.black),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'OK',
+              style: TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
       ),
     );
@@ -292,6 +394,23 @@ class _GameScreenState extends State<GameScreen> {
                       Text("SCOREBOARD",
                           style: TextStyle(
                               fontSize: 40, fontWeight: FontWeight.w800)),
+                      SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Difficulty: ${_getDifficultyLabel()}",
+                              style: TextStyle(
+                                  fontSize: 18, 
+                                  fontWeight: FontWeight.bold,
+                                  color: _getDifficultyColor())),
+                          SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: () => _showAiInfo(),
+                            child: Icon(Icons.info_outline, 
+                                color: Colors.blue, size: 20),
+                          ),
+                        ],
+                      ),
                       SizedBox(height: 10),
                       Text("You: $playerScore", style: TextStyle(fontSize: 24)),
                       Text("Bot: $botScore", style: TextStyle(fontSize: 24)),

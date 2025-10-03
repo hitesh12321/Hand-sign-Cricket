@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hand_sign_cricket/screens/toss_screen.dart';
+import 'package:hand_sign_cricket/screens/Bot.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../themes/app_colors.dart';
@@ -63,6 +64,71 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  void _showResetAiDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.yellow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(color: Colors.black, width: 3),
+          ),
+          title: Text(
+            '🤖 Reset AI Learning',
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.w900,
+              fontSize: 24,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          content: Text(
+            "This will reset the bot's learning data. The AI will forget all patterns it has learned from your gameplay.\n\nAre you sure?",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Reset AI learning data
+                AiBot tempBot = AiBot(difficulty: Difficulty.medium);
+                await tempBot.resetPatternData();
+                Navigator.of(context).pop();
+                
+                // Show confirmation
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("🤖 AI learning data has been reset!"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: Text(
+                'Reset',
+                style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,14 +186,20 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
             opacity: _menuOpacity,
             child: Column(
               children: [
-                AnimatedScaleButton(
-                  text: "Single Player",
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => TossScreen()));
+                GestureDetector(
+                  onLongPress: () {
+                    // Debug feature: Long press to reset AI learning data
+                    _showResetAiDialog();
                   },
-                  icon: Icons.person,
-                  scaleAnimation: _buttonScale,
+                  child: AnimatedScaleButton(
+                    text: "Single Player",
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => TossScreen()));
+                    },
+                    icon: Icons.person,
+                    scaleAnimation: _buttonScale,
+                  ),
                 ),
                 AnimatedScaleButton(
                   text: "Multiplayer",
