@@ -11,14 +11,16 @@ class _RatingDialogState extends State<RatingDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.yellowAccent,
+      backgroundColor: const Color.fromARGB(255, 121, 178, 239),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.black, width: 3),
+        side: const BorderSide(color: Colors.black, width: 3),
       ),
-      title: Text(
+      title: const Text(
         "Rate the Game",
-        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        style: TextStyle(
+            color: const Color.fromARGB(255, 3, 25, 48),
+            fontWeight: FontWeight.bold),
         textAlign: TextAlign.center,
       ),
       content: Row(
@@ -39,12 +41,20 @@ class _RatingDialogState extends State<RatingDialog> {
         }),
       ),
       actions: [
-        TextButton(
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color.fromARGB(255, 19, 127, 242),
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
           onPressed: () => Navigator.pop(context),
-          child: Text(
+          child: const Text(
             "Submit",
-            style:
-                TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: const Color.fromARGB(255, 3, 25, 48),
+                fontWeight: FontWeight.bold),
           ),
         ),
       ],

@@ -7,12 +7,12 @@ class AnimatedScaleButton extends StatelessWidget {
   final Animation<double> scaleAnimation;
 
   const AnimatedScaleButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onTap,
     required this.icon,
     required this.scaleAnimation,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +21,11 @@ class AnimatedScaleButton extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: onTap,
         icon: Icon(icon, color: Colors.white),
-        label: Text(text, style: TextStyle(color: Colors.white)),
+        label: Text(text, style: const TextStyle(color: Colors.white)),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
-          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-          textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),

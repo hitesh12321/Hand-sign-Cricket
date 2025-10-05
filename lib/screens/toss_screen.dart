@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hand_sign_cricket/themes/app_colors.dart';
 import 'package:hand_sign_cricket/themes/app_fonts.dart';
 
@@ -25,10 +26,10 @@ class _TossScreenState extends State<TossScreen> {
   void performToss() {
     setState(() {
       isTossing = true;
-      animationAsset = 'assets/animation/toss.gif';
+      animationAsset = 'assets/animation/coin-flip.gif';
     });
 
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 3), () {
       int sum = userNumber! + botNumber;
       bool isEven = sum % 2 == 0;
       bool userChoseEven = userChoice == "Even";
@@ -39,12 +40,13 @@ class _TossScreenState extends State<TossScreen> {
         if ((isEven && userChoseEven) || (!isEven && !userChoseEven)) {
           tossResult = "🎉 Yay! You won!";
           userWonToss = true;
-          animationAsset = 'assets/animation/win.gif';
+
+          animationAsset = 'assets/animation/tosswin2.gif';
         } else {
           tossResult = "😞 Bad luck! You lost!";
           userWonToss = false;
           botDecision = Random().nextBool() ? "Bat" : "Bowl";
-          animationAsset = 'assets/animation/loss.gif';
+          animationAsset = 'assets/animation/lost2.gif';
           Future.delayed(const Duration(seconds: 2), () {
             navigateToGame(botDecision);
           });
@@ -67,7 +69,7 @@ class _TossScreenState extends State<TossScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundBlue,
+      backgroundColor: const Color.fromARGB(255, 121, 178, 239),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -76,19 +78,19 @@ class _TossScreenState extends State<TossScreen> {
             if (tossDone) ...[
               Text(
                 tossResult,
-                style: AppFonts.bebasNeue(
+                style: AppFonts.aDLaMDisplay(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Colors.black),
               ),
               const SizedBox(height: 20),
               if (userWonToss) ...[
-                Text("Choose Bat or Bowl",
+                const Text("Choose Bat or Bowl",
                     style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.black)),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 Row(
@@ -97,7 +99,7 @@ class _TossScreenState extends State<TossScreen> {
                       .map((e) => ElevatedButton(
                             onPressed: () => navigateToGame(e),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.yellow,
+                              backgroundColor: AppColors.boxYellow,
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 30, vertical: 15),
                               shape: RoundedRectangleBorder(
@@ -105,7 +107,7 @@ class _TossScreenState extends State<TossScreen> {
                               elevation: 10,
                             ),
                             child: Text(e,
-                                style: AppFonts.bebasNeue(
+                                style: AppFonts.aDLaMDisplay(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black)),
@@ -114,18 +116,14 @@ class _TossScreenState extends State<TossScreen> {
                 ),
               ] else ...[
                 Text("Bot chose to $botDecision",
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.black)),
               ],
             ],
             if (!isTossing && !tossDone) ...[
-              Text("Choose Odd or Even",
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white)),
+              Text("Choose Odd or Even", style: AppFonts.aDLaMDisplay()),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: ["Odd", "Even"].map((e) {
@@ -137,13 +135,13 @@ class _TossScreenState extends State<TossScreen> {
                           horizontal: 40, vertical: 15),
                       decoration: BoxDecoration(
                         color: userChoice == e
-                            ? Colors.white
-                            : AppColors.boxYellow,
+                            ? AppColors.boxYellow
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(25),
                         border: Border.all(color: Colors.black, width: 3),
                       ),
                       child: Text(e,
-                          style: AppFonts.bebasNeue(
+                          style: AppFonts.aDLaMDisplay(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.black)),
@@ -153,17 +151,17 @@ class _TossScreenState extends State<TossScreen> {
               ),
               if (userChoice != null) ...[
                 const SizedBox(height: 20),
-                const Text("Select a number (1-6)",
-                    style: TextStyle(
-                        fontSize: 24,
+                Text("Select a number (1-6)",
+                    style: GoogleFonts.aDLaMDisplay(
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white)),
+                        color: Colors.black)),
                 GridView.builder(
                   shrinkWrap: true,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
                   ),
                   itemCount: 6,
                   itemBuilder: (context, index) {
@@ -172,7 +170,8 @@ class _TossScreenState extends State<TossScreen> {
                       child: Container(
                         decoration: BoxDecoration(
                           border: userNumber == index + 1
-                              ? Border.all(color: Colors.yellowAccent, width: 5)
+                              ? Border.all(
+                                  color: AppColors.dialogOrange, width: 5)
                               : Border.all(color: Colors.black, width: 5),
                           borderRadius: BorderRadius.circular(15),
                         ),
@@ -189,7 +188,7 @@ class _TossScreenState extends State<TossScreen> {
                 ElevatedButton(
                   onPressed: performToss,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.yellow,
+                    backgroundColor: AppColors.boxYellow,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 60, vertical: 20),
                     shape: RoundedRectangleBorder(
@@ -197,7 +196,7 @@ class _TossScreenState extends State<TossScreen> {
                     elevation: 12,
                   ),
                   child: Text("Toss",
-                      style: AppFonts.bebasNeue(
+                      style: AppFonts.aDLaMDisplay(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.black)),

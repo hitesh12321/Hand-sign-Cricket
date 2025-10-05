@@ -1,13 +1,18 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hand_sign_cricket/screens/toss_screen.dart';
+import 'package:hand_sign_cricket/transitions/PageTransition.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../themes/app_colors.dart';
+import '../themes/app_fonts.dart';
 import '../widgets/howtoplay.dart';
 import '../widgets/rating_dialog.dart';
 
 class MenuScreen extends StatefulWidget {
+  const MenuScreen({super.key});
+
   @override
   _MenuScreenState createState() => _MenuScreenState();
 }
@@ -21,6 +26,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
       _buttonScale,
       _floatingMovement;
 
+  final screenTransition = ScreenTransition();
+
   @override
   void initState() {
     super.initState();
@@ -28,12 +35,14 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     // Title Slide-in Animation
     _titleController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 700));
-    _titleSlide = Tween(begin: -50.0, end: 0.0).animate(
+    _titleSlide = Tween(begin: -200.0, end: 10.0).animate(
         CurvedAnimation(parent: _titleController, curve: Curves.easeOut));
 
     // Menu Fade-in & Bounce Animation
     _menuController = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 1000));
+      vsync: this,
+      duration: Duration(milliseconds: 2000),
+    );
     _menuOpacity =
         CurvedAnimation(parent: _menuController, curve: Curves.easeInOut);
     _buttonScale = Tween(begin: 0.8, end: 1.0).animate(
@@ -46,12 +55,14 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
         reverseDuration: Duration(seconds: 2))
       ..repeat(reverse: true);
 
-    _floatingMovement = Tween(begin: 0.0, end: 5.0).animate(
+    _floatingMovement = Tween(begin: 0.0, end: 20.0).animate(
         CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _titleController.forward();
-      _menuController.forward();
+      Future.delayed(const Duration(milliseconds: 200), () {
+        _menuController.forward();
+      });
     });
   }
 
@@ -78,28 +89,24 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 offset: Offset(0, _titleSlide.value),
                 child: child,
               );
-            }, //🏏
+            },
             child: Column(
               children: [
                 Text(
                   "HAND CRICKET",
-                  style: GoogleFonts.creepster(
-                    fontSize: 100,
+                  style: AppFonts.pressStart2p(
+                    fontSize: 50,
                     fontWeight: FontWeight.w900,
-                    color: Colors.orangeAccent,
+                    color: AppColors.titleOrange,
                     shadows: [
                       Shadow(
                           blurRadius: 12.0,
-                          color: Colors.redAccent,
-                          offset: Offset(10, 3)),
-                      Shadow(
-                          blurRadius: 1.0,
-                          color: Colors.black,
+                          color: AppColors.shadowBlack,
                           offset: Offset(5, 5)),
                       Shadow(
-                          blurRadius: 13.0,
-                          color: Colors.deepOrange,
-                          offset: Offset(-3, -3)),
+                          blurRadius: 1.0,
+                          color: AppColors.darkShadow,
+                          offset: Offset(-2, -3)),
                     ],
                   ),
                   textAlign: TextAlign.center,
@@ -123,8 +130,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 AnimatedScaleButton(
                   text: "Single Player",
                   onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => TossScreen()));
+                    Navigator.of(context)
+                        .push(ScreenTransition.createRoute(TossScreen()));
                   },
                   icon: Icons.person,
                   scaleAnimation: _buttonScale,
@@ -132,38 +139,74 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 AnimatedScaleButton(
                   text: "Multiplayer",
                   onTap: () {
-                    showDialog(
+                    showGeneralDialog(
                       context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          backgroundColor: Colors.yellow,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(color: Colors.black, width: 3),
-                          ),
-                          content: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Text(
-                              "🚀 We will bring this feature very soon! Stay tuned! 🎉",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                      barrierDismissible: true,
+                      barrierLabel: "Dialog",
+                      barrierColor: Colors.black54,
+                      transitionDuration: Duration(milliseconds: 400),
+                      pageBuilder: (context, anim1, anim2) {
+                        return Center(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: Container(
+                              width: 350,
+                              padding: EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: AppColors.dialogYellow,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                    color: AppColors.shadowBlack, width: 3),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "🚀 We will bring this feature very soon! Stay tuned! 🎉",
+                                    textAlign: TextAlign.center,
+                                    style: AppFonts.main(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.dialogBlack,
+                                    ),
+                                  ),
+                                  SizedBox(height: 40),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.dialogOrange,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 30, vertical: 10),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: Text(
+                                      'OK',
+                                      style: AppFonts.main(
+                                        fontSize: 30,
+                                        color: AppColors.dialogBlack,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: Text(
-                                'OK',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
+                        );
+                      },
+                      transitionBuilder: (context, anim1, anim2, child) {
+                        return ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: anim1,
+                            curve: Curves.elasticOut,
+                          ),
+                          child: FadeTransition(
+                            opacity: anim1,
+                            child: child,
+                          ),
                         );
                       },
                     );
@@ -174,7 +217,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 AnimatedScaleButton(
                   text: "How to Play",
                   onTap: () {
-                    play.showHowToPlayDialog(context);
+                    Play.showHowToPlayDialog(context);
                   },
                   icon: Icons.help,
                   scaleAnimation: _buttonScale,
@@ -196,26 +239,46 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                GestureDetector(
-                  onTap: () {
+                TextButton.icon(
+                  onPressed: () {
                     const url =
                         "https://github.com/aavvvacado/Hand-sign-Cricket";
                     launchUrl(Uri.parse(url),
                         mode: LaunchMode.externalApplication);
                   },
-                  child: Image.asset(
-                    "assets/icons/github.png",
-                    width: 50,
-                    height: 50,
+                  label: Row(
+                    children: [
+                      Image.asset(
+                        "assets/icons/github.png",
+                        width: 40,
+                        height: 40,
+                      ),
+                      Text(" GitHub",
+                          style: AppFonts.main(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.buttonTextBlue))
+                    ],
                   ),
                 ),
-                SizedBox(width: 50),
-                GestureDetector(
-                  onTap: () {
+                SizedBox(width: 20),
+                TextButton.icon(
+                  onPressed: () {
                     showDialog(
                         context: context, builder: (_) => RatingDialog());
                   },
-                  child: Icon(Icons.star, color: Colors.white, size: 50),
+                  label: Text(
+                    "Rate Us",
+                    style: AppFonts.main(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.buttonTextBlue),
+                  ),
+                  icon: Icon(
+                    Icons.star_border,
+                    color: AppColors.buttonTextBlue,
+                    size: 50,
+                  ),
                 ),
               ],
             ),
@@ -234,6 +297,7 @@ class AnimatedScaleButton extends StatelessWidget {
   final Animation<double> scaleAnimation;
 
   const AnimatedScaleButton({
+    super.key,
     required this.text,
     required this.onTap,
     required this.icon,
@@ -255,25 +319,25 @@ class AnimatedScaleButton extends StatelessWidget {
             padding: EdgeInsets.all(15),
             decoration: BoxDecoration(
               color: AppColors.boxYellow,
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(9, 9),
-                    blurRadius: 5,
+                    color: AppColors.shadowBlack,
+                    offset: Offset(3, 3),
+                    blurRadius: 7,
                     blurStyle: BlurStyle.solid)
               ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: AppColors.textRed, size: 30),
+                Icon(icon, size: 45, color: AppColors.buttonTextBlue),
                 SizedBox(width: 15),
                 Text(text,
-                    style: TextStyle(
-                        fontSize: 25,
+                    style: AppFonts.main(
+                        fontSize: 29,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textRed)),
+                        color: AppColors.buttonTextBlue)),
               ],
             ),
           ),

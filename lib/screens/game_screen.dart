@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -69,7 +71,7 @@ class _GameScreenState extends State<GameScreen> {
         if (shot == botShot) {
           wickets++;
           _showOutGif = true; // Show "out" GIF
-          Future.delayed(Duration(seconds: 2), () {
+          Future.delayed(const Duration(seconds: 2), () {
             setState(() {
               _showOutGif = false; // Hide GIF after delay
             });
@@ -81,7 +83,7 @@ class _GameScreenState extends State<GameScreen> {
         if (shot == botShot) {
           wickets++;
           _showOutGif = true;
-          Future.delayed(Duration(seconds: 2), () {
+          Future.delayed(const Duration(seconds: 2), () {
             setState(() {
               _showOutGif = false;
             });
@@ -126,31 +128,31 @@ class _GameScreenState extends State<GameScreen> {
     gameOver = true;
     String result = playerWon ? "🎉 You Win! 🎉" : "😢 Bot Wins! 😢";
     String gifPath = playerWon
-        ? "assets/animation/win.gif"
-        : "assets/animation/loss.gif"; // Choose GIF based on result
+        ? "assets/animation/win2.gif"
+        : "assets/animation/lost2.gif"; // Choose GIF based on result
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.yellowAccent,
+        backgroundColor: AppColors.dialogYellow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
-          side: BorderSide(color: Colors.black, width: 3),
+          side: const BorderSide(color: Colors.black, width: 3),
         ),
         title: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            const Text(
               " Match Over ",
               style: TextStyle(
-                color: Colors.red,
+                color: AppColors.titleOrange,
                 fontSize: 32,
                 fontWeight: FontWeight.w900,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 10), // Space between title and GIF
+            const SizedBox(height: 10), // Space between title and GIF
             Container(
               height: 120, // Adjust size as needed
               width: 120,
@@ -163,7 +165,7 @@ class _GameScreenState extends State<GameScreen> {
                 child: Image.asset(gifPath, fit: BoxFit.cover),
               ),
             ),
-            SizedBox(height: 10), // Space between GIF and result text
+            const SizedBox(height: 10), // Space between GIF and result text
           ],
         ),
         content: Text(
@@ -182,7 +184,7 @@ class _GameScreenState extends State<GameScreen> {
                 setState(() {});
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.dialogOrange,
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
@@ -206,7 +208,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundBlue,
+      backgroundColor: const Color.fromARGB(255, 112, 174, 240),
       body: Stack(
         children: [
           Container(
@@ -220,35 +222,15 @@ class _GameScreenState extends State<GameScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "You",
-                        style: GoogleFonts.creepster(
-                          fontSize: 65,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.purpleAccent,
+                        "👦🏻\nYou",
+                        style: GoogleFonts.bangers(
+                          fontSize: 60,
+                          color: Colors.black,
                           shadows: [
-                            Shadow(
-                                blurRadius: 12.0,
-                                color: Colors.deepPurple,
-                                offset: Offset(4, 4)),
-                            Shadow(
-                                blurRadius: 3.0,
-                                color: Colors.black,
-                                offset: Offset(2, 2)),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        "VS",
-                        style: GoogleFonts.creepster(
-                          decoration: TextDecoration.lineThrough,
-                          fontSize: 25,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          shadows: [
-                            Shadow(
-                                blurRadius: 10.0,
-                                color: Colors.grey,
-                                offset: Offset(2, 2)),
+                            // Shadow(
+                            //     blurRadius: 12.0,
+                            //     color: Colors.deepPurple,
+                            //     offset: Offset(4, 4)),
                             Shadow(
                                 blurRadius: 3.0,
                                 color: Colors.black,
@@ -257,20 +239,41 @@ class _GameScreenState extends State<GameScreen> {
                         ),
                       ),
                       Text(
-                        "Bot",
-                        style: GoogleFonts.creepster(
-                          fontSize: 65,
+                        "VS",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 60,
                           fontWeight: FontWeight.w900,
-                          color: Colors.red,
+                          color: Colors.white,
                           shadows: [
                             Shadow(
-                                blurRadius: 12.0,
-                                color: Colors.redAccent,
-                                offset: Offset(4, 4)),
+                                blurRadius: 30.0,
+                                color: Colors.grey,
+                                offset: Offset(5, 4)),
+                            // Shadow(
+                            //     blurRadius: 3.0,
+                            //     color: Colors.black,
+                            //     offset: Offset(1, 1)),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        " 🤖 \nBot",
+                        style: GoogleFonts.bangers(
+                          fontSize: 60,
+                          color: Colors.black,
+                          shadows: [
                             Shadow(
                                 blurRadius: 3.0,
                                 color: Colors.black,
-                                offset: Offset(2, 2)),
+                                offset: Offset(1, 1)),
+                            // Shadow(
+                            //     blurRadius: 12.0,
+                            //     color: Colors.redAccent,
+                            //     offset: Offset(4, 4)),
+                            // Shadow(
+                            //     blurRadius: 3.0,
+                            //     color: Colors.black,
+                            //     offset: Offset(2, 2)),
                           ],
                         ),
                       ),
@@ -283,22 +286,37 @@ class _GameScreenState extends State<GameScreen> {
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.yellowAccent,
+                    color: const Color.fromARGB(255, 28, 138, 234),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.black, width: 5),
                   ),
                   child: Column(
                     children: [
                       Text("SCOREBOARD",
-                          style: TextStyle(
-                              fontSize: 40, fontWeight: FontWeight.w800)),
-                      SizedBox(height: 10),
-                      Text("You: $playerScore", style: TextStyle(fontSize: 24)),
-                      Text("Bot: $botScore", style: TextStyle(fontSize: 24)),
+                          style: GoogleFonts.pressStart2p(
+                              fontSize: 37,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      Text("You: $playerScore",
+                          style: GoogleFonts.montserrat(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                      Text("Bot: $botScore",
+                          style: GoogleFonts.montserrat(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                       Text("Wickets: $wickets / $maxWickets",
-                          style: TextStyle(fontSize: 18)),
+                          style: GoogleFonts.montserrat(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                       Text("Overs: $overs.${balls % 6} / $maxOvers",
-                          style: TextStyle(fontSize: 18)),
+                          style: GoogleFonts.montserrat(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                       if (!isFirstInnings)
                         Text("Target: $target",
                             style: TextStyle(
@@ -308,9 +326,9 @@ class _GameScreenState extends State<GameScreen> {
                           // Semi-transparent background
                           child: Center(
                             child: Image.asset(
-                              'assets/animation/out.gif',
-                              width: 200, // Adjust size as needed
-                              height: 200,
+                              'assets/animation/wickets.gif',
+                              width: 100, // Adjust size as needed
+                              height: 100,
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -322,7 +340,9 @@ class _GameScreenState extends State<GameScreen> {
                 GridView.builder(
                   shrinkWrap: true,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3),
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 1,
+                      crossAxisSpacing: 1),
                   itemCount: 6,
                   itemBuilder: (context, index) {
                     int number = index + 1;

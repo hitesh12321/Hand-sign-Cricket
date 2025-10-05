@@ -1,9 +1,12 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hand_sign_cricket/screens/toss_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // For local storage
 
 import '../themes/app_colors.dart';
+import '../themes/app_fonts.dart';
 
 class GameSetupScreen extends StatefulWidget {
   final bool isMultiplayer;
@@ -35,7 +38,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: AppColors.dialogBlack),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -70,14 +73,16 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
       decoration: BoxDecoration(
         color: AppColors.boxYellow,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: AppColors.shadowBlack, blurRadius: 5)],
+        boxShadow: const [
+          BoxShadow(color: AppColors.shadowBlack, blurRadius: 5)
+        ],
       ),
       child: Text(
         widget.isMultiplayer ? "Multiplayer Setup" : "Single Player Setup",
-        style: TextStyle(
+        style: AppFonts.main(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: AppColors.mainTextBrown),
+            color: AppColors.dialogBlack),
       ),
     );
   }
@@ -88,7 +93,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
       onChanged: (value) => setState(() => _teamName = value),
       decoration: InputDecoration(
         labelText: "Team Name",
-        labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        labelStyle: AppFonts.main(fontWeight: FontWeight.bold, fontSize: 18),
         filled: true,
         fillColor: AppColors.boxYellow.withOpacity(0.2),
         border: OutlineInputBorder(
@@ -100,7 +105,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
           borderSide: BorderSide(color: AppColors.boxYellow),
         ),
       ),
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      style: AppFonts.main(fontSize: 18, fontWeight: FontWeight.bold),
     );
   }
 
@@ -122,7 +127,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
               decoration: InputDecoration(
                 labelText: "Player ${i + 1} Name",
                 labelStyle:
-                    TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    AppFonts.main(fontWeight: FontWeight.bold, fontSize: 18),
                 filled: true,
                 fillColor: AppColors.boxYellow.withOpacity(0.2),
                 border: OutlineInputBorder(
@@ -134,7 +139,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                   borderSide: BorderSide(color: AppColors.boxYellow),
                 ),
               ),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: AppFonts.main(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
       ],
@@ -159,7 +164,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
               decoration: InputDecoration(
                 labelText: "Player ${i + 1} Name",
                 labelStyle:
-                    TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    AppFonts.main(fontWeight: FontWeight.bold, fontSize: 18),
                 filled: true,
                 fillColor: AppColors.boxYellow.withOpacity(0.2),
                 border: OutlineInputBorder(
@@ -171,7 +176,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                   borderSide: BorderSide(color: AppColors.boxYellow),
                 ),
               ),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: AppFonts.main(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
       ],
@@ -184,17 +189,19 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: TextStyle(
+            style: AppFonts.main(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.white)),
+                color: AppColors.buttonTextBlue)),
         SizedBox(height: 8),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
           decoration: BoxDecoration(
             color: AppColors.boxYellow.withOpacity(0.2),
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [BoxShadow(color: AppColors.shadowBlack, blurRadius: 5)],
+            boxShadow: const [
+              BoxShadow(color: AppColors.shadowBlack, blurRadius: 5)
+            ],
           ),
           child: DropdownButtonFormField<int>(
             value: value,
@@ -205,7 +212,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                       value: e,
                       child: Text(
                         e.toString(),
-                        style: TextStyle(
+                        style: AppFonts.main(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ))
@@ -219,18 +226,18 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
 
   Widget _buildStartButton() {
     return ElevatedButton(
-      onPressed: () {},
-      child: Text(
-        "Start Game",
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      ),
+      onPressed: _startSinglePlayerGame,
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-        textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        textStyle: AppFonts.main(fontSize: 20, fontWeight: FontWeight.bold),
         backgroundColor: AppColors.boxYellow,
-        foregroundColor: Colors.black,
+        foregroundColor: AppColors.dialogBlack,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         shadowColor: AppColors.shadowBlack,
+      ),
+      child: Text(
+        "Start Game",
+        style: AppFonts.main(fontSize: 20, fontWeight: FontWeight.bold),
       ),
     );
   }

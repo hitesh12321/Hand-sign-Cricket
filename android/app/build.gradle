@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.hand_sign_cricket"
-        minSdkVersion 23
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutter.versionCode
         versionName flutter.versionName
@@ -30,7 +30,9 @@ android {
 
     buildTypes {
         release {
-            signingConfig debug.signingConfig // Use proper signing config
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for a release build is NOT recommended.
+            signingConfig signingConfigs.debug
         }
     }
 }

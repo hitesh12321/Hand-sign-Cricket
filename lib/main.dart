@@ -22,7 +22,7 @@ class HandCricketApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MenuScreen(), // Start with the Menu Screen
+      home: const MenuScreen(), // Start with the Menu Screen
     );
   }
 }
