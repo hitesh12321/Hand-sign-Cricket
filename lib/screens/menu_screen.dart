@@ -3,7 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hand_sign_cricket/screens/toss_screen.dart';
 import 'package:hand_sign_cricket/screens/Bot.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import '../providers/audio_provider.dart';
+import 'package:provider/provider.dart';
 import '../themes/app_colors.dart';
 import '../widgets/howtoplay.dart';
 import '../widgets/rating_dialog.dart';
@@ -25,7 +26,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
+    Provider.of<AudioProvider>(context, listen: false).playMusic();
     // Title Slide-in Animation
     _titleController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 700));
@@ -96,9 +97,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Cancel',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold),
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
               ),
             ),
             TextButton(
@@ -107,7 +107,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 AiBot tempBot = AiBot(difficulty: Difficulty.medium);
                 await tempBot.resetPatternData();
                 Navigator.of(context).pop();
-                
+
                 // Show confirmation
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -118,9 +118,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               },
               child: Text(
                 'Reset',
-                style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold),
+                style:
+                    TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -131,6 +130,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: AppColors.backgroundBlue,
       body: Column(
@@ -194,8 +194,11 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                   child: AnimatedScaleButton(
                     text: "Single Player",
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => TossScreen()));
+                      audioProvider.playSoundEffect('button_click.mp3');
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TossScreen()));
                     },
                     icon: Icons.person,
                     scaleAnimation: _buttonScale,
@@ -204,6 +207,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 AnimatedScaleButton(
                   text: "Multiplayer",
                   onTap: () {
+                    audioProvider.playSoundEffect('button_click.mp3');
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -246,6 +250,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 AnimatedScaleButton(
                   text: "How to Play",
                   onTap: () {
+                    audioProvider.playSoundEffect('button_click.mp3');
                     play.showHowToPlayDialog(context);
                   },
                   icon: Icons.help,
@@ -270,6 +275,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               children: [
                 GestureDetector(
                   onTap: () {
+                    audioProvider.playSoundEffect('button_click.mp3');
                     const url =
                         "https://github.com/aavvvacado/Hand-sign-Cricket";
                     launchUrl(Uri.parse(url),
@@ -284,6 +290,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 SizedBox(width: 50),
                 GestureDetector(
                   onTap: () {
+                    audioProvider.playSoundEffect('button_click.wav');
                     showDialog(
                         context: context, builder: (_) => RatingDialog());
                   },

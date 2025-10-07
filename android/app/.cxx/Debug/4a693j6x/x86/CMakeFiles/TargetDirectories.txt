@@ -1,0 +1,2 @@
+C:/flutter_projects/Hand-sign-Cricket/android/app/.cxx/Debug/4a693j6x/x86/CMakeFiles/edit_cache.dir
+C:/flutter_projects/Hand-sign-Cricket/android/app/.cxx/Debug/4a693j6x/x86/CMakeFiles/rebuild_cache.dir
