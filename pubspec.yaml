@@ -30,6 +30,7 @@ flutter:
 
   assets:
     - assets/animation/
-    - assets/sounds/
+    # - assets/sounds/
     - assets/gestures/
     - assets/icons/
+

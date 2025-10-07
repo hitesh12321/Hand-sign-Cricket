@@ -69,7 +69,7 @@ class _GameScreenState extends State<GameScreen> {
         if (shot == botShot) {
           wickets++;
           _showOutGif = true; // Show "out" GIF
-          Future.delayed(Duration(seconds: 2), () {
+          Future.delayed(const Duration(microseconds: 1000), () {
             setState(() {
               _showOutGif = false; // Hide GIF after delay
             });
@@ -81,7 +81,7 @@ class _GameScreenState extends State<GameScreen> {
         if (shot == botShot) {
           wickets++;
           _showOutGif = true;
-          Future.delayed(Duration(seconds: 2), () {
+          Future.delayed(const Duration(milliseconds: 2000), () {
             setState(() {
               _showOutGif = false;
             });
@@ -136,12 +136,12 @@ class _GameScreenState extends State<GameScreen> {
         backgroundColor: Colors.yellowAccent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
-          side: BorderSide(color: Colors.black, width: 3),
+          side: const BorderSide(color: Colors.black, width: 3),
         ),
         title: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            const Text(
               " Match Over ",
               style: TextStyle(
                 color: Colors.red,
@@ -150,7 +150,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 10), // Space between title and GIF
+            const SizedBox(height: 10), // Space between title and GIF
             Container(
               height: 120, // Adjust size as needed
               width: 120,
@@ -163,12 +163,12 @@ class _GameScreenState extends State<GameScreen> {
                 child: Image.asset(gifPath, fit: BoxFit.cover),
               ),
             ),
-            SizedBox(height: 10), // Space between GIF and result text
+            const SizedBox(height: 10), // Space between GIF and result text
           ],
         ),
         content: Text(
           result,
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         actions: [
@@ -183,12 +183,13 @@ class _GameScreenState extends State<GameScreen> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
               ),
-              child: Text(
+              child: const Text(
                 "Back to Main Menu",
                 style: TextStyle(
                     fontSize: 20,
@@ -197,7 +198,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ),
           ),
-          SizedBox(height: 10), // Extra space at bottom for better UI
+          const SizedBox(height: 10), // Extra space at bottom for better UI
         ],
       ),
     );
@@ -209,13 +210,14 @@ class _GameScreenState extends State<GameScreen> {
       backgroundColor: AppColors.backgroundBlue,
       body: Stack(
         children: [
-          Container(
+          SizedBox(
             height: MediaQuery.of(context).size.height,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -226,11 +228,11 @@ class _GameScreenState extends State<GameScreen> {
                           fontWeight: FontWeight.w900,
                           color: Colors.purpleAccent,
                           shadows: [
-                            Shadow(
+                            const Shadow(
                                 blurRadius: 12.0,
                                 color: Colors.deepPurple,
                                 offset: Offset(4, 4)),
-                            Shadow(
+                            const Shadow(
                                 blurRadius: 3.0,
                                 color: Colors.black,
                                 offset: Offset(2, 2)),
@@ -245,11 +247,11 @@ class _GameScreenState extends State<GameScreen> {
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
                           shadows: [
-                            Shadow(
+                            const Shadow(
                                 blurRadius: 10.0,
                                 color: Colors.grey,
                                 offset: Offset(2, 2)),
-                            Shadow(
+                            const Shadow(
                                 blurRadius: 3.0,
                                 color: Colors.black,
                                 offset: Offset(1, 1)),
@@ -263,11 +265,11 @@ class _GameScreenState extends State<GameScreen> {
                           fontWeight: FontWeight.w900,
                           color: Colors.red,
                           shadows: [
-                            Shadow(
+                            const Shadow(
                                 blurRadius: 12.0,
                                 color: Colors.redAccent,
                                 offset: Offset(4, 4)),
-                            Shadow(
+                            const Shadow(
                                 blurRadius: 3.0,
                                 color: Colors.black,
                                 offset: Offset(2, 2)),
@@ -277,11 +279,11 @@ class _GameScreenState extends State<GameScreen> {
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Container(
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.yellowAccent,
                     borderRadius: BorderRadius.circular(20),
@@ -289,28 +291,29 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                   child: Column(
                     children: [
-                      Text("SCOREBOARD",
+                      const Text("SCOREBOARD",
                           style: TextStyle(
                               fontSize: 40, fontWeight: FontWeight.w800)),
-                      SizedBox(height: 10),
-                      Text("You: $playerScore", style: TextStyle(fontSize: 24)),
-                      Text("Bot: $botScore", style: TextStyle(fontSize: 24)),
+                      const SizedBox(height: 10),
+                      Text("You: $playerScore",
+                          style: const TextStyle(fontSize: 24)),
+                      Text("Bot: $botScore",
+                          style: const TextStyle(fontSize: 24)),
                       Text("Wickets: $wickets / $maxWickets",
-                          style: TextStyle(fontSize: 18)),
+                          style: const TextStyle(fontSize: 18)),
                       Text("Overs: $overs.${balls % 6} / $maxOvers",
-                          style: TextStyle(fontSize: 18)),
+                          style: const TextStyle(fontSize: 18)),
                       if (!isFirstInnings)
                         Text("Target: $target",
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold)),
                       if (_showOutGif)
-                        Container(
-                          // Semi-transparent background
+                        SizedBox(
+                          height: 100, // Adjust size as needed
+                          width: 100,
                           child: Center(
                             child: Image.asset(
-                              'assets/animation/out.gif',
-                              width: 200, // Adjust size as needed
-                              height: 200,
+                              'assets/animation/wickt.gif',
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -318,10 +321,11 @@ class _GameScreenState extends State<GameScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
+                // grid of 6 boxes
                 GridView.builder(
                   shrinkWrap: true,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3),
                   itemCount: 6,
                   itemBuilder: (context, index) {
@@ -329,7 +333,7 @@ class _GameScreenState extends State<GameScreen> {
                     return GestureDetector(
                       onTap: () => playBall(number),
                       child: Container(
-                        margin: EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: AppColors.boxYellow,
                           borderRadius: BorderRadius.circular(10),

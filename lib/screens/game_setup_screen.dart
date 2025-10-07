@@ -35,7 +35,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -46,16 +46,16 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildTitle(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildTeamNameInput(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               widget.isMultiplayer
                   ? _buildMultiplayerPlayerSelection()
                   : _buildSinglePlayerSettings(),
               _buildDropdown("Number of Overs", _overs, 1, 5, (value) {
                 setState(() => _overs = value);
               }),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildStartButton(),
             ],
           ),
@@ -66,15 +66,15 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
 
   Widget _buildTitle() {
     return Container(
-      padding: EdgeInsets.all(15),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: AppColors.boxYellow,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: AppColors.shadowBlack, blurRadius: 5)],
+        boxShadow:const [ BoxShadow(color: AppColors.shadowBlack, blurRadius: 5)],
       ),
       child: Text(
         widget.isMultiplayer ? "Multiplayer Setup" : "Single Player Setup",
-        style: TextStyle(
+        style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
             color: AppColors.mainTextBrown),
@@ -88,19 +88,19 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
       onChanged: (value) => setState(() => _teamName = value),
       decoration: InputDecoration(
         labelText: "Team Name",
-        labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         filled: true,
         fillColor: AppColors.boxYellow.withOpacity(0.2),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.boxYellow),
+          borderSide: const BorderSide(color: AppColors.boxYellow),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.boxYellow),
+          borderSide: const BorderSide(color: AppColors.boxYellow),
         ),
       ),
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
     );
   }
 
@@ -113,7 +113,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
             _playerNames = List.generate(value, (_) => '');
           });
         }),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         for (int i = 0; i < _numPlayers; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -122,19 +122,19 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
               decoration: InputDecoration(
                 labelText: "Player ${i + 1} Name",
                 labelStyle:
-                    TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 filled: true,
-                fillColor: AppColors.boxYellow.withOpacity(0.2),
+                fillColor: AppColors.boxYellow.withValues(alpha :0.2),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.boxYellow),
+                  borderSide: const BorderSide(color: AppColors.boxYellow),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.boxYellow),
+                  borderSide: const BorderSide(color: AppColors.boxYellow),
                 ),
               ),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
       ],
@@ -150,7 +150,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
             _playerNames = List.generate(value, (_) => '');
           });
         }),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         for (int i = 0; i < _numPlayers; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -159,19 +159,19 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
               decoration: InputDecoration(
                 labelText: "Player ${i + 1} Name",
                 labelStyle:
-                    TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 filled: true,
-                fillColor: AppColors.boxYellow.withOpacity(0.2),
+                fillColor: AppColors.boxYellow.withValues(alpha :0.2),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.boxYellow),
+                  borderSide: const BorderSide(color: AppColors.boxYellow),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.boxYellow),
+                  borderSide: const BorderSide(color: AppColors.boxYellow),
                 ),
               ),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
       ],
@@ -184,28 +184,28 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.white)),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
           decoration: BoxDecoration(
-            color: AppColors.boxYellow.withOpacity(0.2),
+            color: AppColors.boxYellow.withValues(alpha :0.2),
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [BoxShadow(color: AppColors.shadowBlack, blurRadius: 5)],
+            boxShadow: const[ BoxShadow(color: AppColors.shadowBlack, blurRadius: 5)],
           ),
           child: DropdownButtonFormField<int>(
-            value: value,
+            initialValue: value,
             dropdownColor: AppColors.boxYellow,
-            decoration: InputDecoration.collapsed(hintText: ''),
+            decoration: const InputDecoration.collapsed(hintText: ''),
             items: List.generate(max - min + 1, (index) => min + index)
                 .map((e) => DropdownMenuItem(
                       value: e,
                       child: Text(
                         e.toString(),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ))
@@ -220,17 +220,17 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
   Widget _buildStartButton() {
     return ElevatedButton(
       onPressed: () {},
-      child: Text(
-        "Start Game",
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      ),
       style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-        textStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         backgroundColor: AppColors.boxYellow,
         foregroundColor: Colors.black,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         shadowColor: AppColors.shadowBlack,
+      ),
+      child: const Text(
+        "Start Game",
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
     );
   }
