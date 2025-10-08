@@ -290,7 +290,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 SizedBox(width: 50),
                 GestureDetector(
                   onTap: () {
-                    audioProvider.playSoundEffect('button_click.wav');
+                    audioProvider.playSoundEffect('button_click.mp3');
                     showDialog(
                         context: context, builder: (_) => RatingDialog());
                   },

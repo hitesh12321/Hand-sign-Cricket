@@ -2,16 +2,19 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hand_sign_cricket/providers/audio_provider.dart';
 import 'package:hand_sign_cricket/screens/menu_screen.dart';
 import 'package:hand_sign_cricket/screens/Bot.dart';
 import 'package:hand_sign_cricket/themes/app_colors.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GameScreen extends StatefulWidget {
   final bool userBatsFirst;
   final Difficulty difficulty;
 
-  GameScreen({required this.userBatsFirst, this.difficulty = Difficulty.medium});
+  GameScreen(
+      {required this.userBatsFirst, this.difficulty = Difficulty.medium});
 
   @override
   _GameScreenState createState() => _GameScreenState();
@@ -82,30 +85,65 @@ class _GameScreenState extends State<GameScreen> {
       maxOvers: maxOvers,
       maxWickets: maxWickets,
     );
-    
+
     // Use AI bot to make decision
     return aiBot.makeDecision(userShot, currentState);
   }
 
+  // void playBall(int shot) {
+  //   final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+  //   if (gameOver) return;
+  //   int botShot = botDecision(shot);
+
+  //   setState(() {
+  //     if (isPlayerBatting) {
+  //       if (shot == botShot) {
+  //         audioProvider.playSoundEffect('wicket_sound.mp3');
+  //         audioProvider.playSoundEffect('crowd_groan.mp3');
+  //         wickets++;
+  //         _showOutGif = true; // Show "out" GIF
+  //         Future.delayed(Duration(seconds: 2), () {
+  //           setState(() {
+  //             _showOutGif = false; // Hide GIF after delay
+  //           });
+  //         });
+  //       } else {
+  //         playerScore += shot;
+  //       }
+  //     } else {
+  //       if (shot == botShot) {
+  //         wickets++;
+  //         _showOutGif = true;
+  //         Future.delayed(Duration(seconds: 2), () {
+  //           setState(() {
+  //             _showOutGif = false;
+  //           });
+  //         });
+  //       } else {
+  //         botScore += botShot;
+  //       }
+  //     }
+  //     balls++;
+  //     if (balls % 6 == 0) overs++;
+
+  //     _checkGameState();
+  //   });
+  // }
+
   void playBall(int shot) {
     if (gameOver) return;
+
+    // Get a reference to the audio provider
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+
     int botShot = botDecision(shot);
 
     setState(() {
       if (isPlayerBatting) {
         if (shot == botShot) {
-          wickets++;
-          _showOutGif = true; // Show "out" GIF
-          Future.delayed(Duration(seconds: 2), () {
-            setState(() {
-              _showOutGif = false; // Hide GIF after delay
-            });
-          });
-        } else {
-          playerScore += shot;
-        }
-      } else {
-        if (shot == botShot) {
+          // PLAYER IS OUT
+          audioProvider.playSoundEffect('wicket_sound.mp3');
+          audioProvider.playSoundEffect('crowd_groan.mp3');
           wickets++;
           _showOutGif = true;
           Future.delayed(Duration(seconds: 2), () {
@@ -114,6 +152,31 @@ class _GameScreenState extends State<GameScreen> {
             });
           });
         } else {
+          audioProvider.playSoundEffect('bat_hit.mp3');
+          if (shot >= 4) {
+            audioProvider.playSoundEffect('loud_cheer.mp3');
+          } else {
+            audioProvider.playSoundEffect('short_cheer.mp3');
+          }
+          playerScore += shot;
+        }
+      } else {
+        // Player is Bowling
+        if (shot == botShot) {
+          // BOT IS OUT (Good for player)
+          audioProvider.playSoundEffect('wicket_sound.mp3');
+          audioProvider.playSoundEffect('loud_cheer.mp3');
+          wickets++;
+          _showOutGif = true;
+          Future.delayed(Duration(seconds: 2), () {
+            setState(() {
+              _showOutGif = false;
+            });
+          });
+        } else {
+          // BOT SCORES (Bad for player)
+          audioProvider.playSoundEffect('bat_hit.mp3');
+          audioProvider.playSoundEffect('crowd_groan.mp3');
           botScore += botShot;
         }
       }
@@ -151,10 +214,17 @@ class _GameScreenState extends State<GameScreen> {
 
   void _endGame(bool playerWon) {
     gameOver = true;
-    
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+    audioProvider.stopMusic();
+    if (playerWon) {
+      audioProvider.playSoundEffect('victory_cheer.mp3');
+    } else {
+      audioProvider.playSoundEffect('crowd_groan.mp3');
+    }
+
     // Save AI bot learning data
     aiBot.savePatternData();
-    
+
     String result = playerWon ? "🎉 You Win! 🎉" : "😢 Bot Wins! 😢";
     String gifPath = playerWon
         ? "assets/animation/win.gif"
@@ -206,6 +276,7 @@ class _GameScreenState extends State<GameScreen> {
           Center(
             child: ElevatedButton(
               onPressed: () {
+                audioProvider.playSoundEffect('button_click.mp3');
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MenuScreen()),
@@ -263,11 +334,15 @@ class _GameScreenState extends State<GameScreen> {
       for (var entry in aiBot.userPattern.frequencyMap.entries) {
         info += "${entry.key}: ${entry.value} times\n";
       }
-      info += "\n🎯 Bot's favorite: ${aiBot.userPattern.mostFrequent ?? 'None'}\n";
-      info += "🔍 Pattern detected: ${aiBot.userPattern.hasRepeatingPattern ? 'Yes' : 'No'}\n";
-      info += "📝 Recent choices: ${aiBot.userPattern.recentChoices.take(5).toList()}";
+      info +=
+          "\n🎯 Bot's favorite: ${aiBot.userPattern.mostFrequent ?? 'None'}\n";
+      info +=
+          "🔍 Pattern detected: ${aiBot.userPattern.hasRepeatingPattern ? 'Yes' : 'No'}\n";
+      info +=
+          "📝 Recent choices: ${aiBot.userPattern.recentChoices.take(5).toList()}";
     } else {
-      info = "🤖 Bot is still learning your patterns!\nPlay more to see statistics.";
+      info =
+          "🤖 Bot is still learning your patterns!\nPlay more to see statistics.";
     }
 
     showDialog(
@@ -296,8 +371,8 @@ class _GameScreenState extends State<GameScreen> {
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               'OK',
-              style: TextStyle(
-                  color: Colors.black, fontWeight: FontWeight.bold),
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -307,6 +382,7 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: AppColors.backgroundBlue,
       body: Stack(
@@ -400,13 +476,16 @@ class _GameScreenState extends State<GameScreen> {
                         children: [
                           Text("Difficulty: ${_getDifficultyLabel()}",
                               style: TextStyle(
-                                  fontSize: 18, 
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: _getDifficultyColor())),
                           SizedBox(width: 10),
                           GestureDetector(
-                            onTap: () => _showAiInfo(),
-                            child: Icon(Icons.info_outline, 
+                            onTap: () {
+                              audioProvider.playSoundEffect('button_click.wav');
+                              _showAiInfo();
+                            },
+                            child: Icon(Icons.info_outline,
                                 color: Colors.blue, size: 20),
                           ),
                         ],

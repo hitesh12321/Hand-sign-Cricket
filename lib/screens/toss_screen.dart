@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:hand_sign_cricket/themes/app_colors.dart';
 import 'package:hand_sign_cricket/themes/app_fonts.dart';
 import 'package:hand_sign_cricket/screens/Bot.dart';
-
+import 'package:provider/provider.dart';
+import '../providers/audio_provider.dart';
 import 'game_screen.dart';
 
 class TossScreen extends StatefulWidget {
@@ -25,6 +26,8 @@ class _TossScreenState extends State<TossScreen> {
   Difficulty selectedDifficulty = Difficulty.medium;
 
   void performToss() {
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
+    audioProvider.playSoundEffect('button_click.mp3');
     setState(() {
       isTossing = true;
       animationAsset = 'assets/animation/toss.gif';
@@ -39,10 +42,12 @@ class _TossScreenState extends State<TossScreen> {
         tossDone = true;
         isTossing = false;
         if ((isEven && userChoseEven) || (!isEven && !userChoseEven)) {
+          audioProvider.playSoundEffect('toss_win.mp3');
           tossResult = "🎉 Yay! You won!";
           userWonToss = true;
           animationAsset = 'assets/animation/win.gif';
         } else {
+          audioProvider.playSoundEffect('toss_loss.mp3');
           tossResult = "😞 Bad luck! You lost!";
           userWonToss = false;
           botDecision = Random().nextBool() ? "Bat" : "Bowl";
@@ -56,6 +61,8 @@ class _TossScreenState extends State<TossScreen> {
   }
 
   void navigateToGame(String choice) {
+    Provider.of<AudioProvider>(context, listen: false)
+        .playSoundEffect('button_click.mp3');
     bool userBatsFirst =
         userWonToss ? (choice == "Bat") : (botDecision == "Bowl");
     Navigator.pushReplacement(
@@ -71,6 +78,7 @@ class _TossScreenState extends State<TossScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: AppColors.backgroundBlue,
       body: Center(
@@ -88,12 +96,12 @@ class _TossScreenState extends State<TossScreen> {
               ),
               const SizedBox(height: 20),
               if (userWonToss) ...[
-                Text("Choose Bat or Bowl",
+                const Text("Choose Bat or Bowl",
                     style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.black)),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 Row(
@@ -119,7 +127,7 @@ class _TossScreenState extends State<TossScreen> {
                 ),
               ] else ...[
                 Text("Bot chose to $botDecision",
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.black)),
@@ -129,8 +137,8 @@ class _TossScreenState extends State<TossScreen> {
               // Difficulty Selection
               _buildDifficultySelection(),
               const SizedBox(height: 30),
-              
-              Text("Choose Odd or Even",
+
+              const Text("Choose Odd or Even",
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -139,7 +147,10 @@ class _TossScreenState extends State<TossScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: ["Odd", "Even"].map((e) {
                   return GestureDetector(
-                    onTap: () => setState(() => userChoice = e),
+                    onTap: () {
+                      audioProvider.playSoundEffect('button_click.mp3');
+                      setState(() => userChoice = e);
+                    },
                     child: Container(
                       margin: const EdgeInsets.all(10),
                       padding: const EdgeInsets.symmetric(
@@ -177,7 +188,10 @@ class _TossScreenState extends State<TossScreen> {
                   itemCount: 6,
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onTap: () => setState(() => userNumber = index + 1),
+                      onTap: () {
+                        audioProvider.playSoundEffect('button_click.mp3');
+                        setState(() => userNumber = index + 1);
+                      },
                       child: Container(
                         decoration: BoxDecoration(
                           border: userNumber == index + 1
@@ -220,10 +234,11 @@ class _TossScreenState extends State<TossScreen> {
   }
 
   Widget _buildDifficultySelection() {
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
     return Column(
       children: [
-        Text(
-          "Select Bot Difficulty",
+        const Text(
+          'Select Bot Difficulty',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -234,9 +249,12 @@ class _TossScreenState extends State<TossScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildDifficultyButton("Easy", Difficulty.easy, Colors.green),
-            _buildDifficultyButton("Medium", Difficulty.medium, Colors.orange),
-            _buildDifficultyButton("Hard", Difficulty.hard, Colors.red),
+            _buildDifficultyButton(
+                "Easy", Difficulty.easy, Colors.green, audioProvider),
+            _buildDifficultyButton(
+                "Medium", Difficulty.medium, Colors.orange, audioProvider),
+            _buildDifficultyButton(
+                "Hard", Difficulty.hard, Colors.red, audioProvider),
           ],
         ),
         const SizedBox(height: 10),
@@ -245,10 +263,14 @@ class _TossScreenState extends State<TossScreen> {
     );
   }
 
-  Widget _buildDifficultyButton(String label, Difficulty difficulty, Color color) {
+  Widget _buildDifficultyButton(String label, Difficulty difficulty,
+      Color color, AudioProvider audioProvider) {
     bool isSelected = selectedDifficulty == difficulty;
     return GestureDetector(
-      onTap: () => setState(() => selectedDifficulty = difficulty),
+      onTap: () {
+        audioProvider.playSoundEffect('button_click.mp3');
+        setState(() => selectedDifficulty = difficulty);
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
@@ -282,7 +304,7 @@ class _TossScreenState extends State<TossScreen> {
   Widget _buildDifficultyDescription() {
     String description;
     Color color;
-    
+
     switch (selectedDifficulty) {
       case Difficulty.easy:
         description = "🎯 Basic random moves with simple strategy";
@@ -307,7 +329,7 @@ class _TossScreenState extends State<TossScreen> {
       ),
       child: Text(
         description,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: Colors.white,

@@ -25,7 +25,7 @@ class AudioProvider with ChangeNotifier {
   void playMusic() {
     if (_isSoundEnabled) {
       _musicPlayer.setVolume(_musicVolume);
-      _musicPlayer.play(AssetSource('audio/background_music.mp3'));
+      _musicPlayer.play(AssetSource('sounds/background_music.mp3'));
     }
   }
 
@@ -42,7 +42,7 @@ class AudioProvider with ChangeNotifier {
       // This allows multiple sounds to play at once without conflict.
       final sfxPlayer = AudioPlayer();
       sfxPlayer.setVolume(_sfxVolume);
-      sfxPlayer.play(AssetSource('audio/$soundName'));
+      sfxPlayer.play(AssetSource('sounds/$soundName'));
 
       // The player will dispose itself automatically after playing.
     }
