@@ -1,14 +1,19 @@
 import 'package:firebase_core/firebase_core.dart'; // Import Firebase core
 import 'package:flutter/material.dart';
-
-import 'screens/menu_screen.dart'; // Import your menu screen
+import 'package:hand_sign_cricket/providers/audio_provider.dart';
+import 'package:provider/provider.dart';
+import 'screens/menu_screen.dart';
 
 void main() async {
-  // Ensure Firebase is initialized before running the app
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase
 
-  runApp(const HandCricketApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AudioProvider(),
+      child: const HandCricketApp(),
+    ),
+  );
 }
 
 class HandCricketApp extends StatelessWidget {
@@ -22,7 +27,7 @@ class HandCricketApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MenuScreen(), // Start with the Menu Screen
+      home: MenuScreen(),
     );
   }
 }
