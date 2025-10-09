@@ -1,15 +1,23 @@
+// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors_in_immutables
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hand_sign_cricket/screens/menu_screen.dart';
+import 'package:hand_sign_cricket/screens/Bot.dart';
+import 'package:hand_sign_cricket/screens/toss_screen.dart';
 import 'package:hand_sign_cricket/themes/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GameScreen extends StatefulWidget {
   final bool userBatsFirst;
+  final Difficulty difficulty;
 
-  GameScreen({required this.userBatsFirst});
+  GameScreen(
+      {super.key,
+      required this.userBatsFirst,
+      this.difficulty = Difficulty.medium});
 
   @override
   _GameScreenState createState() => _GameScreenState();
@@ -27,6 +35,7 @@ class _GameScreenState extends State<GameScreen> {
   bool gameOver = false;
   bool _showOutGif = false;
 
+  late AiBot aiBot;
   final int maxOvers = 5;
   final int maxWickets = 2;
 
@@ -34,7 +43,20 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     isPlayerBatting = widget.userBatsFirst;
+    aiBot = AiBot(difficulty: widget.difficulty);
     _loadGameData();
+    _initializeAiBot();
+  }
+
+  @override
+  void dispose() {
+    // Save pattern data when leaving the screen
+    aiBot.savePatternData();
+    super.dispose();
+  }
+
+  Future<void> _initializeAiBot() async {
+    await aiBot.loadPatternData();
   }
 
   Future<void> _loadGameData() async {
@@ -53,11 +75,22 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   int botDecision(int userShot) {
-    if (!isFirstInnings) {
-      int runsNeeded = target - botScore;
-      if (runsNeeded <= 6) return runsNeeded;
-    }
-    return Random().nextInt(6) + 1;
+    // Create current game state
+    GameState currentState = GameState(
+      playerScore: playerScore,
+      botScore: botScore,
+      wickets: wickets,
+      balls: balls,
+      overs: overs,
+      target: target,
+      isFirstInnings: isFirstInnings,
+      isPlayerBatting: isPlayerBatting,
+      maxOvers: maxOvers,
+      maxWickets: maxWickets,
+    );
+
+    // Use AI bot to make decision
+    return aiBot.makeDecision(userShot, currentState);
   }
 
   void playBall(int shot) {
@@ -124,10 +157,14 @@ class _GameScreenState extends State<GameScreen> {
 
   void _endGame(bool playerWon) {
     gameOver = true;
+
+    // Save AI bot learning data
+    aiBot.savePatternData();
+
     String result = playerWon ? "🎉 You Win! 🎉" : "😢 Bot Wins! 😢";
     String gifPath = playerWon
-        ? "assets/animation/win.gif"
-        : "assets/animation/loss.gif"; // Choose GIF based on result
+        ? "assets/animation/Trophy.gif"
+        : "assets/animation/sad.gif"; // Choose GIF based on result
 
     showDialog(
       context: context,
@@ -144,7 +181,7 @@ class _GameScreenState extends State<GameScreen> {
             const Text(
               " Match Over ",
               style: TextStyle(
-                color: Colors.red,
+                color: Color.fromARGB(255, 230, 48, 35),
                 fontSize: 32,
                 fontWeight: FontWeight.w900,
               ),
@@ -152,6 +189,8 @@ class _GameScreenState extends State<GameScreen> {
             ),
             const SizedBox(height: 10), // Space between title and GIF
             Container(
+              // color: Colors.white,
+
               height: 120, // Adjust size as needed
               width: 120,
               decoration: BoxDecoration(
@@ -173,32 +212,139 @@ class _GameScreenState extends State<GameScreen> {
         ),
         actions: [
           Center(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MenuScreen()),
-                );
-                setState(() {});
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+            child: Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => TossScreen()),
+                    );
+                    setState(() {});
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: const Text(
+                    "Try Again",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
                 ),
-              ),
-              child: const Text(
-                "Back to Main Menu",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
-              ),
+                const SizedBox(
+                  height: 4,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MenuScreen()),
+                    );
+                    setState(() {});
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: const Text(
+                    "Back to Main Menu",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 10), // Extra space at bottom for better UI
+        ],
+      ),
+    );
+  }
+
+  String _getDifficultyLabel() {
+    switch (widget.difficulty) {
+      case Difficulty.easy:
+        return "Easy 🟢";
+      case Difficulty.medium:
+        return "Medium 🟡";
+      case Difficulty.hard:
+        return "Hard 🔴";
+    }
+  }
+
+  Color _getDifficultyColor() {
+    switch (widget.difficulty) {
+      case Difficulty.easy:
+        return Colors.green;
+      case Difficulty.medium:
+        return Colors.orange;
+      case Difficulty.hard:
+        return Colors.red;
+    }
+  }
+
+  void _showAiInfo() {
+    String info = "";
+    if (aiBot.userPattern.frequencyMap.isNotEmpty) {
+      info += "📊 Your number usage:\n";
+      for (var entry in aiBot.userPattern.frequencyMap.entries) {
+        info += "${entry.key}: ${entry.value} times\n";
+      }
+      info +=
+          "\n🎯 Bot's favorite: ${aiBot.userPattern.mostFrequent ?? 'None'}\n";
+      info +=
+          "🔍 Pattern detected: ${aiBot.userPattern.hasRepeatingPattern ? 'Yes' : 'No'}\n";
+      info +=
+          "📝 Recent choices: ${aiBot.userPattern.recentChoices.take(5).toList()}";
+    } else {
+      info =
+          "🤖 Bot is still learning your patterns!\nPlay more to see statistics.";
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.yellowAccent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: const BorderSide(color: Colors.black, width: 3),
+        ),
+        title: const Text(
+          "🧠 AI Analysis",
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          info,
+          style: const TextStyle(fontSize: 16, color: Colors.black),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'OK',
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
       ),
     );
@@ -210,142 +356,158 @@ class _GameScreenState extends State<GameScreen> {
       backgroundColor: AppColors.backgroundBlue,
       body: Stack(
         children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "You",
-                        style: GoogleFonts.creepster(
-                          fontSize: 65,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.purpleAccent,
-                          shadows: [
-                            const Shadow(
-                                blurRadius: 12.0,
-                                color: Colors.deepPurple,
-                                offset: Offset(4, 4)),
-                            const Shadow(
-                                blurRadius: 3.0,
-                                color: Colors.black,
-                                offset: Offset(2, 2)),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        "VS",
-                        style: GoogleFonts.creepster(
-                          decoration: TextDecoration.lineThrough,
-                          fontSize: 25,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          shadows: [
-                            const Shadow(
-                                blurRadius: 10.0,
-                                color: Colors.grey,
-                                offset: Offset(2, 2)),
-                            const Shadow(
-                                blurRadius: 3.0,
-                                color: Colors.black,
-                                offset: Offset(1, 1)),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        "Bot",
-                        style: GoogleFonts.creepster(
-                          fontSize: 65,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.red,
-                          shadows: [
-                            const Shadow(
-                                blurRadius: 12.0,
-                                color: Colors.redAccent,
-                                offset: Offset(4, 4)),
-                            const Shadow(
-                                blurRadius: 3.0,
-                                color: Colors.black,
-                                offset: Offset(2, 2)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.yellowAccent,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.black, width: 5),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text("SCOREBOARD",
-                          style: TextStyle(
-                              fontSize: 40, fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 10),
-                      Text("You: $playerScore",
-                          style: const TextStyle(fontSize: 24)),
-                      Text("Bot: $botScore",
-                          style: const TextStyle(fontSize: 24)),
-                      Text("Wickets: $wickets / $maxWickets",
-                          style: const TextStyle(fontSize: 18)),
-                      Text("Overs: $overs.${balls % 6} / $maxOvers",
-                          style: const TextStyle(fontSize: 18)),
-                      if (!isFirstInnings)
-                        Text("Target: $target",
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)),
-                      if (_showOutGif)
-                        SizedBox(
-                          height: 100, // Adjust size as needed
-                          width: 100,
-                          child: Center(
-                            child: Image.asset(
-                              'assets/animation/wickt.gif',
-                              fit: BoxFit.contain,
-                            ),
+          Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "👦🏻\nYou",
+                          style: GoogleFonts.bangers(
+                            fontSize: 60,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.black,
+                            shadows: [
+                              const Shadow(
+                                  blurRadius: 3.0,
+                                  color: Colors.black,
+                                  offset: Offset(1, 1)),
+                            ],
                           ),
                         ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // grid of 6 boxes
-                GridView.builder(
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3),
-                  itemCount: 6,
-                  itemBuilder: (context, index) {
-                    int number = index + 1;
-                    return GestureDetector(
-                      onTap: () => playBall(number),
-                      child: Container(
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.boxYellow,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black, width: 5),
+                        Text(
+                          "VS",
+                          style: GoogleFonts.montserrat(
+                            fontSize: 60,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            shadows: [
+                              const Shadow(
+                                  blurRadius: 30.0,
+                                  color: Colors.grey,
+                                  offset: Offset(5, 4)),
+                            ],
+                          ),
                         ),
-                        child: Image.asset('assets/gestures/$number.png',
-                            fit: BoxFit.cover),
-                      ),
-                    );
-                  },
-                ),
-              ],
+                        Text(
+                          " 🤖 \nBot",
+                          style: GoogleFonts.bangers(
+                            fontSize: 60,
+                            color: Colors.black,
+                            shadows: [
+                              const Shadow(
+                                  blurRadius: 3.0,
+                                  color: Colors.black,
+                                  offset: Offset(1, 1)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.yellowAccent,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.black, width: 5),
+                    ),
+                    child: Column(
+                      children: [
+                        Text("SCOREBOARD",
+                            style: GoogleFonts.pressStart2p(
+                                fontSize: 35, fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Difficulty: ${_getDifficultyLabel()}",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: _getDifficultyColor())),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () => _showAiInfo(),
+                              child: const Icon(Icons.info_outline,
+                                  color: Colors.blue, size: 20),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text("You: $playerScore",
+                            style: GoogleFonts.montserrat(
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
+                        Text("Bot: $botScore",
+                            style: GoogleFonts.montserrat(
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
+                        Text("Wickets: $wickets / $maxWickets",
+                            style: GoogleFonts.montserrat(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
+                        Text("Overs: $overs.${balls % 6} / $maxOvers",
+                            style: GoogleFonts.montserrat(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black)),
+                        if (!isFirstInnings)
+                          Text("Target: $target",
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                        if (_showOutGif)
+                          SizedBox(
+                            height: 80, // Adjust size as needed
+                            width: 100,
+                            child: Center(
+                              child: Image.asset(
+                                'assets/animation/wckt.gif',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  // const SizedBox(height: 20),
+                  // grid of 6 boxes
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3),
+                    itemCount: 6,
+                    itemBuilder: (context, index) {
+                      int number = index + 1;
+                      return GestureDetector(
+                        onTap: () => playBall(number),
+                        child: Container(
+                          margin: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.boxYellow,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.black, width: 5),
+                          ),
+                          child: Image.asset('assets/gestures/$number.png',
+                              fit: BoxFit.cover),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ],

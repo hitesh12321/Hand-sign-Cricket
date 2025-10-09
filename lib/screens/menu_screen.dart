@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hand_sign_cricket/Transitions/pageTransitions.dart';
 import 'package:hand_sign_cricket/screens/toss_screen.dart';
+import 'package:hand_sign_cricket/screens/Bot.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../themes/app_colors.dart';
@@ -9,6 +12,8 @@ import '../widgets/howtoplay.dart';
 import '../widgets/rating_dialog.dart';
 
 class MenuScreen extends StatefulWidget {
+  const MenuScreen({super.key});
+
   @override
   _MenuScreenState createState() => _MenuScreenState();
 }
@@ -86,15 +91,11 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
               children: [
                 Text(
                   "HAND CRICKET",
-                  style: GoogleFonts.creepster(
-                    fontSize: 100,
+                  style: GoogleFonts.pressStart2p(
+                    fontSize: 50,
                     fontWeight: FontWeight.w900,
                     color: Colors.orangeAccent,
                     shadows: [
-                      // const Shadow(
-                      //     blurRadius: 12.0,
-                      //     color: Colors.redAccent,
-                      //     offset: Offset(10, 3)),
                       const Shadow(
                           blurRadius: 1.0,
                           color: Colors.black,
@@ -102,7 +103,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                       const Shadow(
                           blurRadius: 13.0,
                           color: Colors.deepOrange,
-                          offset: Offset(-3, -3)),
+                          offset: Offset(-2, -3)),
                     ],
                   ),
                   textAlign: TextAlign.center,
@@ -124,7 +125,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
             child: Column(
               children: [
                 AnimatedScaleButton(
-                  text: "Single Player",
+                  text: "ꜱɪɴɢʟᴇ ᴘʟᴀʏᴇʀ",
                   onTap: () {
                     Navigator.of(context)
                         .push(ScreenTransition.createRoute(TossScreen()));
@@ -133,7 +134,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                   scaleAnimation: _buttonScale,
                 ),
                 AnimatedScaleButton(
-                  text: "Multiplayer",
+                  text: "ᴍᴜʟᴛɪᴘʟᴀʏᴇʀ",
                   onTap: () {
                     showDialog(
                       context: context,
@@ -176,7 +177,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                   scaleAnimation: _buttonScale,
                 ),
                 AnimatedScaleButton(
-                  text: "How to Play",
+                  text: "ʜᴏᴡ ᴛᴏ ᴘʟᴀʏ",
                   onTap: () {
                     play.showHowToPlayDialog(context);
                   },
@@ -209,8 +210,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                   },
                   child: Image.asset(
                     "assets/icons/github.png",
-                    width: 50,
-                    height: 50,
+                    width: 70,
+                    height: 70,
                   ),
                 ),
                 const SizedBox(width: 50),
@@ -219,7 +220,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                     showDialog(
                         context: context, builder: (_) => RatingDialog());
                   },
-                  child: const Icon(Icons.star, color: Colors.white, size: 50),
+                  child: const Icon(Icons.star, color: Colors.white, size: 77),
                 ),
               ],
             ),
@@ -238,6 +239,7 @@ class AnimatedScaleButton extends StatelessWidget {
   final Animation<double> scaleAnimation;
 
   const AnimatedScaleButton({
+    super.key,
     required this.text,
     required this.onTap,
     required this.icon,
@@ -271,7 +273,7 @@ class AnimatedScaleButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: AppColors.textRed, size: 30),
+                Icon(icon, color: AppColors.textRed, size: 40),
                 const SizedBox(width: 15),
                 Text(text,
                     style: const TextStyle(

@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hand_sign_cricket/screens/toss_screen.dart';
@@ -90,7 +92,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
         labelText: "Team Name",
         labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         filled: true,
-        fillColor: AppColors.boxYellow.withOpacity(0.2),
+        fillColor: AppColors.boxYellow.withValues(alpha: 0.2),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.boxYellow),
@@ -244,6 +246,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
 
     // Navigate to TossScreen with isMultiplayer = false
     Navigator.push(
+      // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
         builder: (context) => TossScreen(),
