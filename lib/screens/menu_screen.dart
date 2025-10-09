@@ -265,53 +265,94 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 
           // Floating Icons (GitHub & Rating)
           AnimatedBuilder(
-            animation: _floatingController,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(0, _floatingMovement.value),
-                child: child,
-              );
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    audioProvider.playSoundEffect('button_click.mp3');
-                    const url =
-                        "https://github.com/aavvvacado/Hand-sign-Cricket";
-                    launchUrl(Uri.parse(url),
-                        mode: LaunchMode.externalApplication);
-                  },
-                  child: Image.asset(
-                    "assets/icons/github.png",
-                    width: 50,
-                    height: 50,
+              animation: _floatingController,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(0, _floatingMovement.value),
+                  child: child,
+                );
+              },
+              // child: Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     GestureDetector(
+              //       onTap: () {
+              //         audioProvider.playSoundEffect('button_click.mp3');
+              //         const url =
+              //             "https://github.com/aavvvacado/Hand-sign-Cricket";
+              //         launchUrl(Uri.parse(url),
+              //             mode: LaunchMode.externalApplication);
+              //       },
+              //       child: Image.asset(
+              //         "assets/icons/github.png",
+              //         width: 50,
+              //         height: 50,
+              //       ),
+              //     ),
+              //     const SizedBox(width: 50),
+              //     GestureDetector(
+              //       onTap: () {
+              //         audioProvider.playSoundEffect('button_click.mp3');
+              //         showDialog(
+              //             context: context, builder: (_) => RatingDialog());
+              //       },
+              //       child: const Icon(Icons.star, color: Colors.white, size: 50),
+              //     ),
+              //     const SizedBox(width: 50),
+              //     GestureDetector(
+              //       onTap: () {
+              //         audioProvider.playSoundEffect('button_click.wav');
+              //         showDialog(
+              //             context: context,
+              //             builder: (_) => const SettingsDialog());
+              //       },
+              //       child:
+              //           const Icon(Icons.settings, color: Colors.black, size: 50),
+              //     ),
+              //   ],
+              // ),
+
+              // Replace your Row with this Wrap widget
+
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 40.0,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      audioProvider.playSoundEffect('button_click.wav');
+                      const url =
+                          "https://github.com/aavvvacado/Hand-sign-Cricket";
+                      launchUrl(Uri.parse(url),
+                          mode: LaunchMode.externalApplication);
+                    },
+                    child: Image.asset(
+                      "assets/icons/github.png",
+                      width: 50,
+                      height: 50,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 50),
-                GestureDetector(
-                  onTap: () {
-                    audioProvider.playSoundEffect('button_click.mp3');
-                    showDialog(
-                        context: context, builder: (_) => RatingDialog());
-                  },
-                  child: const Icon(Icons.star, color: Colors.white, size: 50),
-                ),
-                const SizedBox(width: 50),
-                GestureDetector(
-                  onTap: () {
-                    audioProvider.playSoundEffect('button_click.wav');
-                    showDialog(
-                        context: context,
-                        builder: (_) => const SettingsDialog());
-                  },
-                  child:
-                      const Icon(Icons.settings, color: Colors.white, size: 50),
-                ),
-              ],
-            ),
-          ),
+                  GestureDetector(
+                    onTap: () {
+                      audioProvider.playSoundEffect('button_click.wav');
+                      showDialog(
+                          context: context, builder: (_) => RatingDialog());
+                    },
+                    child:
+                        const Icon(Icons.star, color: Colors.white, size: 50),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      audioProvider.playSoundEffect('button_click.wav');
+                      showDialog(
+                          context: context,
+                          builder: (_) => const SettingsDialog());
+                    },
+                    child: const Icon(Icons.settings,
+                        color: Colors.black, size: 50),
+                  ),
+                ],
+              )),
         ],
       ),
     );
