@@ -296,6 +296,15 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                   },
                   child: Icon(Icons.star, color: Colors.white, size: 50),
                 ),
+                const SizedBox(width: 50),
+                GestureDetector(
+                  onTap: () {
+                    audioProvider.playSoundEffect('button_click.wav');
+                    showDialog(
+                        context: context, builder: (_) => SettingsDialog());
+                  },
+                  child: Icon(Icons.settings, color: Colors.white, size: 50),
+                ),
               ],
             ),
           ),
