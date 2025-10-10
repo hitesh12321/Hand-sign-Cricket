@@ -3,10 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hand_sign_cricket/Transitions/pageTransitions.dart';
+import 'package:hand_sign_cricket/screens/settings_dialog_screen.dart';
 import 'package:hand_sign_cricket/screens/toss_screen.dart';
 import 'package:hand_sign_cricket/screens/Bot.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import '../providers/audio_provider.dart';
+import 'package:provider/provider.dart';
 import '../themes/app_colors.dart';
 import '../widgets/howtoplay.dart';
 import '../widgets/rating_dialog.dart';
@@ -32,11 +34,11 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
+    Provider.of<AudioProvider>(context, listen: false).playMusic();
     // Title Slide-in Animation
     _titleController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 700));
-    _titleSlide = Tween(begin: 300.0, end: 0.0).animate(
+    _titleSlide = Tween(begin: -50.0, end: 0.0).animate(
         CurvedAnimation(parent: _titleController, curve: Curves.easeOut));
 
     // Menu Fade-in & Bounce Animation
@@ -50,8 +52,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     // Floating Animation for Icons
     _floatingController = AnimationController(
         vsync: this,
-        duration: const Duration(seconds: 1),
-        reverseDuration: const Duration(seconds: 4))
+        duration: const Duration(seconds: 2),
+        reverseDuration: const Duration(seconds: 2))
       ..repeat(reverse: true);
 
     _floatingMovement = Tween(begin: 0.0, end: 5.0).animate(
@@ -71,8 +73,72 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  void _showResetAiDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.yellow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(color: Colors.black, width: 3),
+          ),
+          title: const Text(
+            '🤖 Reset AI Learning',
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.w900,
+              fontSize: 24,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          content: const Text(
+            "This will reset the bot's learning data. The AI will forget all patterns it has learned from your gameplay.\n\nAre you sure?",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'Cancel',
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Reset AI learning data
+                AiBot tempBot = AiBot(difficulty: Difficulty.medium);
+                await tempBot.resetPatternData();
+                Navigator.of(context).pop();
+
+                // Show confirmation
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("🤖 AI learning data has been reset!"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: const Text(
+                'Reset',
+                style:
+                    TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final audioProvider = Provider.of<AudioProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: AppColors.backgroundBlue,
       body: Column(
@@ -96,6 +162,10 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                     fontWeight: FontWeight.w900,
                     color: Colors.orangeAccent,
                     shadows: [
+                      const Shadow(
+                          blurRadius: 12.0,
+                          color: Colors.redAccent,
+                          offset: Offset(10, 3)),
                       const Shadow(
                           blurRadius: 1.0,
                           color: Colors.black,
@@ -130,12 +200,23 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                     Navigator.of(context)
                         .push(ScreenTransition.createRoute(TossScreen()));
                   },
-                  icon: Icons.person,
-                  scaleAnimation: _buttonScale,
+                  child: AnimatedScaleButton(
+                    text: "Single Player",
+                    onTap: () {
+                      audioProvider.playSoundEffect('button_click.mp3');
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TossScreen()));
+                    },
+                    icon: Icons.person,
+                    scaleAnimation: _buttonScale,
+                  ),
                 ),
                 AnimatedScaleButton(
                   text: "ᴍᴜʟᴛɪᴘʟᴀʏᴇʀ",
                   onTap: () {
+                    audioProvider.playSoundEffect('button_click.mp3');
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -179,6 +260,7 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
                 AnimatedScaleButton(
                   text: "ʜᴏᴡ ᴛᴏ ᴘʟᴀʏ",
                   onTap: () {
+                    audioProvider.playSoundEffect('button_click.mp3');
                     play.showHowToPlayDialog(context);
                   },
                   icon: Icons.help,
@@ -191,40 +273,94 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 
           // Floating Icons (GitHub & Rating)
           AnimatedBuilder(
-            animation: _floatingController,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(0, _floatingMovement.value),
-                child: child,
-              );
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    const url =
-                        "https://github.com/aavvvacado/Hand-sign-Cricket";
-                    launchUrl(Uri.parse(url),
-                        mode: LaunchMode.externalApplication);
-                  },
-                  child: Image.asset(
-                    "assets/icons/github.png",
-                    width: 70,
-                    height: 70,
+              animation: _floatingController,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(0, _floatingMovement.value),
+                  child: child,
+                );
+              },
+              // child: Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     GestureDetector(
+              //       onTap: () {
+              //         audioProvider.playSoundEffect('button_click.mp3');
+              //         const url =
+              //             "https://github.com/aavvvacado/Hand-sign-Cricket";
+              //         launchUrl(Uri.parse(url),
+              //             mode: LaunchMode.externalApplication);
+              //       },
+              //       child: Image.asset(
+              //         "assets/icons/github.png",
+              //         width: 50,
+              //         height: 50,
+              //       ),
+              //     ),
+              //     const SizedBox(width: 50),
+              //     GestureDetector(
+              //       onTap: () {
+              //         audioProvider.playSoundEffect('button_click.mp3');
+              //         showDialog(
+              //             context: context, builder: (_) => RatingDialog());
+              //       },
+              //       child: const Icon(Icons.star, color: Colors.white, size: 50),
+              //     ),
+              //     const SizedBox(width: 50),
+              //     GestureDetector(
+              //       onTap: () {
+              //         audioProvider.playSoundEffect('button_click.wav');
+              //         showDialog(
+              //             context: context,
+              //             builder: (_) => const SettingsDialog());
+              //       },
+              //       child:
+              //           const Icon(Icons.settings, color: Colors.black, size: 50),
+              //     ),
+              //   ],
+              // ),
+
+              // Replace your Row with this Wrap widget
+
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 40.0,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      audioProvider.playSoundEffect('button_click.wav');
+                      const url =
+                          "https://github.com/aavvvacado/Hand-sign-Cricket";
+                      launchUrl(Uri.parse(url),
+                          mode: LaunchMode.externalApplication);
+                    },
+                    child: Image.asset(
+                      "assets/icons/github.png",
+                      width: 50,
+                      height: 50,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 50),
-                GestureDetector(
-                  onTap: () {
-                    showDialog(
-                        context: context, builder: (_) => RatingDialog());
-                  },
-                  child: const Icon(Icons.star, color: Colors.white, size: 77),
-                ),
-              ],
-            ),
-          ),
+                  GestureDetector(
+                    onTap: () {
+                      audioProvider.playSoundEffect('button_click.wav');
+                      showDialog(
+                          context: context, builder: (_) => RatingDialog());
+                    },
+                    child:
+                        const Icon(Icons.star, color: Colors.white, size: 50),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      audioProvider.playSoundEffect('button_click.wav');
+                      showDialog(
+                          context: context,
+                          builder: (_) => const SettingsDialog());
+                    },
+                    child: const Icon(Icons.settings,
+                        color: Colors.black, size: 50),
+                  ),
+                ],
+              )),
         ],
       ),
     );
@@ -273,7 +409,7 @@ class AnimatedScaleButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: AppColors.textRed, size: 40),
+                Icon(icon, color: AppColors.textRed, size: 30),
                 const SizedBox(width: 15),
                 Text(text,
                     style: const TextStyle(

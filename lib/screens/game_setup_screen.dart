@@ -222,6 +222,10 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
   Widget _buildStartButton() {
     return ElevatedButton(
       onPressed: () {},
+      child: const Text(
+        "Start Game",
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
         textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
